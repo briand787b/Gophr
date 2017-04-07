@@ -6,6 +6,9 @@ import (
 )
 
 func main() {
-	log.Fatal(http.ListenAndServe(":3000", http.StripPrefix("/assets/",
-		http.FileServer(http.Dir("assets/")))))
+	mux := http.NewServeMux()
+	mux.Handle("/assets/", http.StripPrefix("/assets/",
+		http.FileServer(http.Dir("assets/"))))
+
+	log.Fatal(http.ListenAndServe(":3000", mux))
 }
