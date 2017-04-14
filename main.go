@@ -2,17 +2,37 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
+type NotFound struct{}
+
+func (n *NotFound) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+}
+
 func main() {
-	mux := http.NewServeMux()
+	unauthenticatedRouter := NewRouter()
+	unauthenticatedRouter.GET("/", HandleHome)
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		RenderTemplate(w, r, "index/home", nil)
-	})
+	authenticatedRouter := NewRouter()
+	authenticatedRouter.GET("/images/new", HandleImageNew)
 
-	mux.Handle("/assets/", http.StripPrefix("/assets/",
+	middleware := Middleware{}
+	middleware.Add(unauthenticatedRouter)
+	middleware.Add(http.HandlerFunc(AuthenticateRequest))
+	middleware.Add(authenticatedRouter)
+
+	http.Handle("/assets/", http.StripPrefix("/assets/",
 		http.FileServer(http.Dir("assets/"))))
 
-	http.ListenAndServe(":3000", mux)
+	http.ListenAndServe(":3000", middleware)
+}
+
+
+func NewRouter() *httprouter.Router {
+	router := httprouter.New()
+	notFound := new(NotFound)
+	router.NotFound = notFound
+	return router
 }
