@@ -7,11 +7,6 @@ import (
 	"log"
 )
 
-type NotFound struct{}
-
-func (n *NotFound) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-}
-
 func main() {
 	router := NewRouter()
 
@@ -30,7 +25,6 @@ func main() {
 
 func NewRouter() *httprouter.Router {
 	router := httprouter.New()
-	notFound := new(NotFound)
-	router.NotFound = notFound
+	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){})
 	return router
 }
