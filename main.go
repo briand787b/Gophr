@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"log"
 )
 
 type NotFound struct{}
@@ -12,21 +13,18 @@ func (n *NotFound) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	unauthenticatedRouter := NewRouter()
-	unauthenticatedRouter.GET("/", HandleHome)
+	router := NewRouter()
 
-	authenticatedRouter := NewRouter()
-	authenticatedRouter.GET("/images/new", HandleImageNew)
+	router.Handle("GET", "/", HandleHome)
+
+	router.ServeFiles(
+		"/assets/*filepath",
+		http.Dir("assets/"),
+	)
 
 	middleware := Middleware{}
-	middleware.Add(unauthenticatedRouter)
-	middleware.Add(http.HandlerFunc(AuthenticateRequest))
-	middleware.Add(authenticatedRouter)
-
-	http.Handle("/assets/", http.StripPrefix("/assets/",
-		http.FileServer(http.Dir("assets/"))))
-
-	http.ListenAndServe(":3000", middleware)
+	middleware.Add(router)
+	log.Fatal(http.ListenAndServe(":3000", middleware))
 }
 
 
