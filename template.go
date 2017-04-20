@@ -1,10 +1,22 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"net/http"
-	"bytes"
+)
+
+var layoutFuncs = template.FuncMap{
+	"yield": func() (string, error) {
+		return "", fmt.Errorf("yield called inappropriately")
+	},
+}
+var layout = template.Must(
+	template.
+		New("layout.html").
+		Funcs(layoutFuncs).
+		ParseFiles("templates/layout.html"),
 )
 
 var templates = template.Must(template.New("t").ParseGlob("templates/**/*.html"))
@@ -17,18 +29,6 @@ var errorTemplate = `
 	</body>
 </html>
 `
-
-var layoutFuncs = template.FuncMap{
-	"yield": func() (string, error) {
-		return " ", fmt.Errorf("yield called inappropriately")
-	},
-}
-
-var layout = template.Must(
-	template.New("layout.html").
-	Funcs(layoutFuncs).
-	ParseFiles("layout.html"),
-)
 
 func RenderTemplate(w http.ResponseWriter, r *http.Request, name string, data interface{}) {
 	funcs := template.FuncMap{
