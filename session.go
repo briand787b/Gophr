@@ -69,13 +69,13 @@ func RequestUser(r *http.Request) *User {
 		return nil
 	}
 
-	user, err := globalUserStore.Find(session.UserID) {
+	user, err := globalUserStore.Find(session.UserID)
 		if err != nil {
 			panic(err)
 		}
 		return user
-	}
 }
+
 
 func RequireLogin(w http.ResponseWriter, r *http.Request) {
 	// Let the request pass if we've got a user

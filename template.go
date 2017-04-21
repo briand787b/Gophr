@@ -30,7 +30,14 @@ var errorTemplate = `
 </html>
 `
 
-func RenderTemplate(w http.ResponseWriter, r *http.Request, name string, data interface{}) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, name string, data map[string]interface{}) {
+	if data == nil {
+		data = map[string]interface{}{}
+	}
+
+	data["CurrentUser"] = RequestUser(r)
+	data["Flash"] = r.URL.Query().Get("flash")
+
 	funcs := template.FuncMap{
 		"yield": func() (template.HTML, error) {
 			buf := bytes.NewBuffer(nil)
