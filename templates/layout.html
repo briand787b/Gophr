@@ -10,11 +10,24 @@
 			</div>
 			<div class="collapse navbar-collapse">
 				<p class="navbar-text navbar-right">
-					<a href="/register" class="navbar-link">Register</a>
+					{{if .CurrentUser}}
+					<a href="/account" class="navbar-link">Account</a> |
+					<a href="/sign-out" class="navbar-link">Sign Out</a>
+					{{else}}
+					<a href="/register" class="navbar-link">Register</a> |
+					<a href="/login" class="navbar-link">Login</a>
+					{{end}}
 				</p>
 			</div>
 		</div>
 	</nav>
-	{{ yield }}
+	<div class="container">
+		{{if .Flash}}
+			<div class="alert alert-info">
+				{{.Flash}}
+			</div>
+		{{end}}
+		{{ yield }}
+	</div>
 	</body>
 </html>

@@ -88,3 +88,12 @@ func RequireLogin(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/login?"+query.Encode(), http.StatusFound)
 }
+
+func FindOrCreateSession(w http.ResponseWriter, r *http.Request) *Session {
+	session := RequestSession(r)
+	if session == nil {
+		session = NewSession(w)
+	}
+
+	return session
+}
