@@ -22,14 +22,6 @@ type FileUserStore struct {
 
 var globalUserStore UserStore
 
-func init() {
-	store, err := NewFileUserStore("./data/users.json")
-	if err != nil {
-		panic(fmt.Errorf("Error creating user store: %s", err))
-	}
-	globalUserStore = store
-}
-
 func (store FileUserStore) Save(user User) error {
 	store.Users[user.ID] = user
 
