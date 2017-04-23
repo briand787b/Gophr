@@ -15,6 +15,9 @@ var (
 	errEmailExists          = ValidationError(errors.New("That email address has an account"))
 	errCredentialsIncorrect = ValidationError(errors.New("We couldn't find a user with the supplied username and password combination"))
 	errPasswordIncorrect    = ValidationError(errors.New("Password did not match"))
+	errInvalidImageType	= ValidationError(errors.New("Please upload only jpeg, gif, or png images"))
+	errNoImage 		= ValidationError(errors.New("Please select and image to upload"))
+	errImageURLInvalid 	= ValidationError(errors.New("Couldn't download image from the URL you provided"))
 )
 
 func IsValidationError(err error) bool {
