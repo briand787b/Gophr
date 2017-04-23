@@ -32,6 +32,7 @@ func HandleUserCreate(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 		panic(err)
 	}
 
+	// Create a new session
 	session := NewSession(w)
 	session.UserID = user.ID
 	fmt.Println("this is the session  ", *session)

@@ -30,15 +30,16 @@ func NewFileSessionStore(name string) (*FileSessionStore, error) {
 	if err != nil {
 		// If it's a matter of the file not existing, it's ok
 		if os.IsNotExist(err) {
-			fmt.Println("./data/sessions.json does not already exist")
 			return store, nil
 		}
-		fmt.Println("serious error creating filesessionstore")
 		return nil, err
 	}
 	err = json.Unmarshal(contents, store)
 	if err != nil {
 		return nil, err
+	}
+	for _, v := range store.Sessions {
+		fmt.Println(v)
 	}
 	return store, err
 }
@@ -53,12 +54,11 @@ func (s *FileSessionStore) Find(id string) (*Session, error) {
 }
 
 func (store *FileSessionStore) Save(session *Session) error {
-	contents, err := json.MarshalIndent(session, "", "	")
+	store.Sessions[session.ID] = *session
+	contents, err := json.MarshalIndent(store, "", "	")
 	if err != nil {
 		return err
 	}
-
-	fmt.Print("Contents of filesessionstore: \n", string(contents))
 
 	return ioutil.WriteFile(store.filename, contents, 0660)
 }

@@ -1,5 +1,9 @@
 {
-	"ID": "sess_bFiApRuk13G7r7rSfJDE",
-	"UserID": "usr_V1GynXNqoIumpemB",
-	"Expiry": "2017-04-19T20:47:01.570797416-04:00"
+	"Sessions": {
+		"sess_sziD04vuHg2N8vz05yHh": {
+			"ID": "sess_sziD04vuHg2N8vz05yHh",
+			"UserID": "usr_1kcTTELUUrMIgsGV",
+			"Expiry": "2017-04-26T18:10:57.903036987-04:00"
+		}
+	}
 }

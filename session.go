@@ -33,7 +33,7 @@ func NewSession(w http.ResponseWriter) *Session {
 		Expires: expiry,
 	}
 
-http.SetCookie(w, &cookie)
+	http.SetCookie(w, &cookie)
 	return session
 }
 
