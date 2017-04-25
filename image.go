@@ -116,3 +116,11 @@ func (image *Image) CreateFromFile(file multipart.File, headers *multipart.FileH
 	// Save the image to the database
 	return globalImageStore.Save(image)
 }
+
+func (image *Image) StaticRoute() string {
+	return "/im/" + image.Location
+}
+
+func (image *Image) ShowRoute() string {
+	return "/image/" + image.ID
+}
