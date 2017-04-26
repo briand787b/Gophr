@@ -8,6 +8,8 @@ import (
 	"os"
 	"io"
 	"mime/multipart"
+	"github.com/disintegration/imaging"
+	"image"
 )
 
 type Image struct {
@@ -28,6 +30,9 @@ type ImageStore interface {
 }
 
 const imageIDLength = 10
+
+var thumbnailWidth = 400
+var widthPreview = 800
 
 // A map of accepted mime types and their file extension
 var mimeExtensions = map[string]string {
@@ -89,6 +94,12 @@ func (image *Image) CreateFromURL(imageURL string) error {
 	// The returned value from io.Copy is the number of bytes copied
 	image.Size = size
 
+	// Create the various resizes of the image
+	err = image.CreateResizedImages()
+	if err != nil {
+		return err
+	}
+
 	// Save our image to the store
 	return globalImageStore.Save(image)
 }
@@ -113,8 +124,56 @@ func (image *Image) CreateFromFile(file multipart.File, headers *multipart.FileH
 	}
 	image.Size = size
 
+	// Create the various resizes of the image
+	err = image.CreateResizedImages()
+	if err != nil {
+		return err
+	}
+
 	// Save the image to the database
 	return globalImageStore.Save(image)
+}
+
+func (image *Image) CreateResizedImages() error {
+	// Generate an image from a file
+	srcImage, err := imaging.Open("./data/images/" + image.Location)
+	if err != nil {
+		return err
+	}
+
+	// Create a channel to send errors on
+	errChan := make(chan error)
+
+	// Process each size
+	go image.resizePreview(errChan, srcImage)
+	go image.resizeThumbnail(errChan, srcImage)
+
+	// Wait for images to finish resizing
+	for i := 0; i < 2; i++ {
+		err = <- errChan
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (image *Image) resizeThumbnail(errChan chan error, srcImage image.Image) {
+	dstImage := imaging.Thumbnail(srcImage, thumbnailWidth, thumbnailWidth, imaging.Lanczos)
+	destination := "./data/images/thumbnail/" + image.Location
+	errChan <- imaging.Save(dstImage, destination)
+}
+
+func (image *Image) resizePreview(errChan chan error, srcImage image.Image) {
+	size := srcImage.Bounds().Size()
+	ratio := float64(size.Y) / float64(size.X)
+	targetHeight := int(float64(widthPreview) * ratio)
+
+	dstImage := imaging.Resize(srcImage, widthPreview, targetHeight, imaging.Lanczos)
+	destination := "./data/images/preview/" + image.Location
+
+	errChan <- imaging.Save(dstImage, destination)
 }
 
 func (image *Image) StaticRoute() string {
@@ -123,4 +182,12 @@ func (image *Image) StaticRoute() string {
 
 func (image *Image) ShowRoute() string {
 	return "/image/" + image.ID
+}
+
+func (image *Image) StaticThumbnailRoute() string {
+	return "/im/thumbnail/" + image.Location
+}
+
+func (image *Image) StaticPreviewRoute() string {
+	return "/im/preview/" + image.Location
 }

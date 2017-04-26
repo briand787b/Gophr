@@ -94,7 +94,7 @@ func HandleUserShow(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		panic(err)
 	}
 
-	RenderTemplate(w, r, "/users/show", map[string]interface{}{
+	RenderTemplate(w, r, "users/show", map[string]interface{}{
 		"User": user,
 		"Images": images,
 	})

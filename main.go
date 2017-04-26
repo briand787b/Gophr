@@ -61,7 +61,7 @@ func main() {
 	router.Handle("GET", "/login", HandleSessionNew)
 	router.Handle("POST", "/login", HandleSessionCreate)
 	router.Handle("GET", "/image/:imageID", HandleImageShow)
-	router.Handle("GET", "/user	/:userID", HandleUserShow)
+	router.Handle("GET", "/user/:userID", HandleUserShow)
 
 	router.ServeFiles(
 		"/assets/*filepath",
