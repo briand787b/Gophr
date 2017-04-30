@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/briand787b/middleware"
 	"log"
 	"io/ioutil"
 	"encoding/json"
@@ -80,7 +81,7 @@ func main() {
 	secureRouter.Handle("GET", "/images/new", HandleImageNew)
 	secureRouter.Handle("POST", "/images/new", HandleImageCreate)
 
-	middleware := Middleware{}
+	middleware := middleware.Middleware{}
 	middleware.Add(router)
 	middleware.Add(http.HandlerFunc(RequireLogin))
 	middleware.Add(secureRouter)
