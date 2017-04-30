@@ -10,6 +10,7 @@ import (
 	"mime/multipart"
 	"github.com/disintegration/imaging"
 	"image"
+	"github.com/briand787b/validation"
 )
 
 type Image struct {
@@ -58,7 +59,7 @@ func (image *Image) CreateFromURL(imageURL string) error {
 
 	// Make sure we have a valid response
 	if response.StatusCode != http.StatusOK {
-		return errImageURLInvalid
+		return validation.ErrImageURLInvalid
 	}
 
 	defer response.Body.Close()
@@ -66,13 +67,13 @@ func (image *Image) CreateFromURL(imageURL string) error {
 	// Ascertain the type of the file we downloaded
 	mimeType, _, err := mime.ParseMediaType(response.Header.Get("Content-Type"))
 	if err != nil {
-		return errInvalidImageType
+		return validation.ErrInvalidImageType
 	}
 
 	// Get an extension for the file
 	ext, valid := mimeExtensions[mimeType]
 	if !valid {
-		return errInvalidImageType
+		return validation.ErrInvalidImageType
 	}
 
 	// Get a name from the URL

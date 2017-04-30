@@ -4,6 +4,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"fmt"
 	"crypto/md5"
+
+	"github.com/briand787b/validation"
 )
 
 
@@ -26,19 +28,19 @@ func NewUser(username, email, password string) (User, error) {
 		Username:	username,
 	}
 	if username == "" {
-		return user, errNoUsername
+		return user, validation.ErrNoUsername
 	}
 
 	if email == "" {
-		return user, errNoEmail
+		return user, validation.ErrNoEmail
 	}
 
 	if password == "" {
-		return user, errNoPassword
+		return user, validation.ErrNoPassword
 	}
 
 	if len(password) < passwordLength {
-		return user, errPasswordTooShort
+		return user, validation.ErrPasswordTooShort
 	}
 
 	// Check if the username exists
@@ -47,7 +49,7 @@ func NewUser(username, email, password string) (User, error) {
 		return user, err
 	}
 	if existingUser != nil {
-		return user, errUsernameExists
+		return user, validation.ErrUsernameExists
 	}
 
 	// Check if the email exists
@@ -56,7 +58,7 @@ func NewUser(username, email, password string) (User, error) {
 		return user, err
 	}
 	if existingUser != nil {
-		return user, errEmailExists
+		return user, validation.ErrEmailExists
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), hashCost)
@@ -77,14 +79,14 @@ func FindUser(username, password string) (*User, error) {
 		return out, err
 	}
 	if existingUser == nil {
-		return out, errCredentialsIncorrect
+		return out, validation.ErrCredentialsIncorrect
 	}
 
 	if bcrypt.CompareHashAndPassword(
 		[]byte(existingUser.HashedPassword),
 		[]byte(password),
 	) != nil {
-		return out, errCredentialsIncorrect
+		return out, validation.ErrCredentialsIncorrect
 	}
 
 	return existingUser, nil
@@ -100,7 +102,7 @@ func UpdateUser(user *User, email, currentPassword, newPassword string) (User, e
 		return out, err
 	}
 	if existingUser != nil && existingUser.ID != user.ID {
-		return out, errEmailExists
+		return out, validation.ErrEmailExists
 	}
 
 	// At this point, we can update the email address
@@ -115,15 +117,15 @@ func UpdateUser(user *User, email, currentPassword, newPassword string) (User, e
 		[]byte(user.HashedPassword),
 		[]byte(currentPassword),
 	) != nil {
-		return out, errPasswordIncorrect
+		return out, validation.ErrPasswordIncorrect
 	}
 
 	if newPassword == "" {
-		return out, errNoPassword
+		return out, validation.ErrNoPassword
 	}
 
 	if len(newPassword) < passwordLength {
-		return out, errPasswordTooShort
+		return out, validation.ErrPasswordTooShort
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), hashCost)

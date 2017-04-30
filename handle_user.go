@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"github.com/julienschmidt/httprouter"
 	"fmt"
+	"github.com/briand787b/validation"
 )
 
 func HandleUserNew(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -17,7 +18,7 @@ func HandleUserCreate(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 		r.FormValue("password"),
 	)
 	if err != nil {
-		if IsValidationError(err) {
+		if validation.IsValidationError(err) {
 			RenderTemplate(w, r, "users/new", map[string]interface{}{
 				"Error": err.Error(),
 				"User": user,
@@ -59,7 +60,7 @@ func HandleUserUpdate(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 
 	user, err := UpdateUser(currentUser, email, currentPassword, newPassword)
 	if err != nil {
-		if IsValidationError(err) {
+		if validation.IsValidationError(err) {
 			RenderTemplate(w, r, "users/edit", map[string]interface{}{
 				"Error": err.Error(),
 				"User": user,

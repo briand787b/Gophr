@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"github.com/julienschmidt/httprouter"
 	"fmt"
+	"github.com/briand787b/validation"
 )
 
 func HandleImageNew(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -28,7 +29,7 @@ func HandleImageCreateFromURL(w http.ResponseWriter, r *http.Request) {
 	err := image.CreateFromURL(r.FormValue("url"))
 
 	if err != nil {
-		if IsValidationError(err) {
+		if validation.IsValidationError(err) {
 			RenderTemplate(w, r, "images/new", map[string]interface{}{
 				"Error": err,
 				"ImageURL": r.FormValue("url"),
@@ -52,7 +53,7 @@ func HandleImageCreateFromFile(w http.ResponseWriter, r *http.Request) {
 	// No file was uploaded
 	if file == nil {
 		RenderTemplate(w, r, "images/new", map[string]interface{}{
-			"Error": errNoImage,
+			"Error": validation.ErrNoImage,
 			"Image": image,
 		})
 		return

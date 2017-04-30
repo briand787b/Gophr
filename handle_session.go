@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"github.com/julienschmidt/httprouter"
+	"github.com/briand787b/validation"
 )
 
 func HandleSessionDestroy(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -31,7 +32,7 @@ func HandleSessionCreate(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 
 	user, err := FindUser(username, password)
 	if err != nil {
-		if IsValidationError(err) {
+		if validation.IsValidationError(err) {
 			RenderTemplate(w, r, "/login", map[string]interface{}{
 				"Error": err,
 				"User": user,
