@@ -5,11 +5,13 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/briand787b/middleware"
+	"github.com/briand787b/mysqlinit"
 	"log"
-	"io/ioutil"
-	"encoding/json"
 	"fmt"
+	"database/sql"
 )
+
+var globalMySQLDB *sql.DB
 
 func init() {
 	// User store initialization
@@ -26,28 +28,10 @@ func init() {
 	}
 	globalSessionStore = sessionStore
 
-	// DB connection initialization
-	var dbCredentials struct{
-		Username string
-		Password string
-	}
-
-	file, err := ioutil.ReadFile("configuration/DBCredentials.json")
+	globalMySQLDB, err = mysqlinit.ConnectDefault("gophr")
 	if err != nil {
 		panic(err)
 	}
-
-	err = json.Unmarshal(file, &dbCredentials)
-	if err != nil {
-		panic(err)
-	}
-
-	dsn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/gophr", dbCredentials.Username, dbCredentials.Password)
-	db, err := NewMySQLDB(dsn)
-	if err != nil {
-		panic(err)
-	}
-	globalMySQLDB = db
 
 	// Image store assignment
 	globalImageStore = NewDBImageStore()
